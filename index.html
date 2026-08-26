@@ -452,6 +452,179 @@
 
   input[type="file"] { display: none; }
 
+  /* ---------- Pestañas de vista (Semana / Mes / Año) ---------- */
+  .tabs-vista {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .tab-btn.activo {
+    background: var(--texto);
+    color: var(--bg);
+    border-color: var(--texto);
+  }
+
+  /* ---------- Vista Mes ---------- */
+  .vista-mes {
+    max-width: 1100px;
+    margin: 16px auto 0;
+    padding: 0 16px;
+  }
+  .cabecera-grid-mes {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: var(--texto-suave);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .grid-mes {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .celda-dia-mes {
+    background: var(--bg-columna);
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 6px;
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: var(--texto);
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+  .celda-dia-mes:hover { border-color: var(--texto-atenuado); }
+  .celda-dia-mes.es-hoy { background: var(--bg-columna-hoy); border-color: var(--borde-hoy); }
+  .celda-dia-mes.fuera-de-mes { opacity: .4; }
+  .celda-dia-mes .numero-dia { font-size: 13px; font-weight: 700; }
+
+  .etiquetas-normal { display: flex; flex-direction: column; gap: 3px; }
+  .etiqueta-tarea-mini {
+    font-size: 11px;
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: var(--bg-tarjeta);
+    border-left: 3px solid transparent;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .etiqueta-tarea-mini.completada {
+    opacity: .55;
+    text-decoration: line-through;
+  }
+  .mas-tareas-dia {
+    font-size: 11px;
+    color: var(--texto-suave);
+  }
+
+  .etiquetas-compactas {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .etiquetas-compactas .punto-color { width: 7px; height: 7px; }
+  .conteo-compacto { font-size: 11px; color: var(--texto-suave); }
+
+  /* ---------- Vista Año ---------- */
+  .vista-anio {
+    max-width: 1100px;
+    margin: 16px auto 0;
+    padding: 0 16px;
+  }
+  .grid-anio {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .mini-mes {
+    background: var(--bg-tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    padding: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: var(--texto);
+    box-shadow: var(--sombra);
+    transition: border-color .15s ease;
+  }
+  .mini-mes:hover { border-color: var(--texto-atenuado); }
+  .mini-mes .nombre-mes {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    text-transform: capitalize;
+  }
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 6px;
+  }
+  .mini-celda {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: var(--texto-atenuado);
+    position: relative;
+  }
+  .mini-celda.es-hoy { font-weight: 700; color: var(--texto); }
+  .punto-estado-dia {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+  .punto-estado-dia.pendiente { background: #f59e0b; }
+  .punto-estado-dia.completo { background: #16a34a; }
+  .mini-mes .total-completadas-mes {
+    font-size: 11.5px;
+    color: var(--texto-suave);
+  }
+
+  /* ---------- Modal: detalle de un día ---------- */
+  .cabecera-detalle-dia {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .cabecera-detalle-dia h2 {
+    margin: 0;
+    font-size: 16px;
+    text-transform: capitalize;
+  }
+  #lista-detalle-dia {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* ---------- Responsive: pantallas medianas ---------- */
+  @media (max-width: 900px) {
+    .grid-anio { grid-template-columns: repeat(3, 1fr); }
+  }
+
   /* ---------- Responsive: iPhone ---------- */
   @media (max-width: 720px) {
     .tablero {
@@ -461,6 +634,10 @@
     }
     h1 { font-size: 19px; }
     .nav-semana .rango-fechas { min-width: 150px; font-size: 14px; }
+    .grid-anio { grid-template-columns: repeat(2, 1fr); }
+    .etiquetas-normal { display: none; }
+    .etiquetas-compactas { display: flex; }
+    .celda-dia-mes { min-height: 64px; }
   }
 </style>
 </head>
@@ -481,15 +658,35 @@
       </div>
     </div>
 
-    <div class="nav-semana">
+    <div class="tabs-vista">
+      <button type="button" class="tab-btn" id="btn-tab-semana" data-vista="semana">Semana</button>
+      <button type="button" class="tab-btn" id="btn-tab-mes" data-vista="mes">Mes</button>
+      <button type="button" class="tab-btn" id="btn-tab-anio" data-vista="anio">Año</button>
+    </div>
+
+    <div class="nav-semana" id="nav-semana">
       <button id="btn-semana-anterior" class="icono" title="Semana anterior">←</button>
       <span class="rango-fechas" id="txt-rango-fechas"></span>
       <button id="btn-hoy">Hoy</button>
       <button id="btn-semana-siguiente" class="icono" title="Semana siguiente">→</button>
     </div>
+
+    <div class="nav-semana" id="nav-mes" hidden>
+      <button id="btn-mes-anterior" class="icono" title="Mes anterior">←</button>
+      <span class="rango-fechas" id="txt-rango-mes"></span>
+      <button id="btn-mes-hoy">Hoy</button>
+      <button id="btn-mes-siguiente" class="icono" title="Mes siguiente">→</button>
+    </div>
+
+    <div class="nav-semana" id="nav-anio" hidden>
+      <button id="btn-anio-anterior" class="icono" title="Año anterior">←</button>
+      <span class="rango-fechas" id="txt-rango-anio"></span>
+      <button id="btn-anio-hoy">Año actual</button>
+      <button id="btn-anio-siguiente" class="icono" title="Año siguiente">→</button>
+    </div>
   </header>
 
-  <section class="resumen">
+  <section class="resumen" id="seccion-resumen">
     <div class="resumen-total">
       Completadas: <strong id="txt-resumen-total">0 / 0</strong>
     </div>
@@ -499,6 +696,32 @@
   <section class="filtro-categorias" id="cont-filtro-categorias"></section>
 
   <main class="tablero" id="tablero"></main>
+
+  <div class="vista-mes" id="vista-mes" hidden>
+    <div class="cabecera-grid-mes">
+      <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+    </div>
+    <div class="grid-mes" id="grid-mes"></div>
+  </div>
+
+  <div class="vista-anio" id="vista-anio" hidden>
+    <div class="grid-anio" id="grid-anio"></div>
+  </div>
+
+  <!-- ================= Modal: detalle de un día (vista Mes) ================= -->
+  <div class="fondo-modal" id="modal-detalle-dia" hidden>
+    <div class="caja-modal">
+      <div class="cabecera-detalle-dia">
+        <h2 id="titulo-detalle-dia">Día</h2>
+        <button type="button" class="icono" id="btn-agregar-desde-detalle">+ Agregar</button>
+      </div>
+      <div id="lista-detalle-dia"></div>
+      <p class="aviso-vacio" id="aviso-detalle-dia-vacio" hidden>Sin tareas este día</p>
+      <div class="acciones-modal">
+        <button type="button" id="btn-cerrar-detalle-dia">Cerrar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= Modal: crear / editar tarea ================= -->
   <div class="fondo-modal" id="modal-tarea" hidden>
@@ -640,7 +863,12 @@
 
   const estado = {
     datos: cargarDatos(),
+    vista: "semana", // "semana" | "mes" | "anio"
     lunesVisible: obtenerLunes(new Date()),
+    mesVisible: primerDiaDelMes(new Date()),
+    anioVisible: new Date().getFullYear(),
+    fechaDiaDetalle: null, // fecha ISO del día abierto en el panel de detalle (vista Mes)
+    lunesAnclaCreacion: obtenerLunes(new Date()), // lunes de referencia para fechaInicio al crear una tarea
     categoriaFiltroId: null, // null = ver todas las categorías
     tareaEditandoId: null,
     tareaParaBorrar: null,
@@ -676,6 +904,20 @@
 
   function esMismoDia(fechaA, fechaB) {
     return formatearFechaISO(fechaA) === formatearFechaISO(fechaB);
+  }
+
+  // Convierte Date.getDay() (0=domingo...6=sábado) a nuestro índice 0=lunes...6=domingo.
+  function indiceDiaSemana(fecha) {
+    const diaJs = fecha.getDay();
+    return diaJs === 0 ? 6 : diaJs - 1;
+  }
+
+  function primerDiaDelMes(fecha) {
+    return new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+  }
+
+  function ultimoDiaDelMes(fecha) {
+    return new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
   }
 
   function formatearRangoSemana(lunes) {
@@ -719,6 +961,16 @@
     return estado.datos.tareas
       .filter((t) => tareaAplicaEnSemana(t, lunesSemana))
       .filter((t) => !estado.categoriaFiltroId || t.categoriaId === estado.categoriaFiltroId);
+  }
+
+  // Tareas que caen en un día puntual (usado por las vistas Mes y Año). Sin filtro de categoría:
+  // quien llama decide si lo aplica o no.
+  function tareasEnFecha(fecha) {
+    const diaSemanaIdx = indiceDiaSemana(fecha);
+    const lunesDeEsaSemana = obtenerLunes(fecha);
+    return estado.datos.tareas.filter(
+      (t) => t.diaSemana === diaSemanaIdx && tareaAplicaEnSemana(t, lunesDeEsaSemana)
+    );
   }
 
   /* =========================================================
@@ -768,13 +1020,25 @@
       btnAgregar.className = "btn-agregar-dia";
       btnAgregar.type = "button";
       btnAgregar.textContent = "+ Agregar";
-      btnAgregar.addEventListener("click", () => abrirModalTarea(null, dia));
+      btnAgregar.addEventListener("click", () => {
+        estado.lunesAnclaCreacion = estado.lunesVisible;
+        abrirModalTarea(null, dia);
+      });
       columna.appendChild(btnAgregar);
 
       elTablero.appendChild(columna);
     }
 
-    renderResumen(tareasSemana);
+    // Armamos las "ocurrencias" (tarea + fecha exacta) de la semana para el resumen genérico.
+    const ocurrenciasFiltradas = tareasSemana.map((t) => ({
+      tarea: t,
+      fechaISO: formatearFechaISO(fechaDeTareaEnSemana(t, estado.lunesVisible)),
+    }));
+    const ocurrenciasSinFiltro = obtenerTareasSemanaSinFiltro().map((t) => ({
+      tarea: t,
+      fechaISO: formatearFechaISO(fechaDeTareaEnSemana(t, estado.lunesVisible)),
+    }));
+    renderResumen(ocurrenciasFiltradas, ocurrenciasSinFiltro);
   }
 
   function crearTarjetaTarea(tarea, fechaColumna) {
@@ -847,7 +1111,7 @@
     if (!tarea.completadas) tarea.completadas = {};
     tarea.completadas[fechaOcurrenciaISO] = !tarea.completadas[fechaOcurrenciaISO];
     guardarDatos();
-    renderTablero();
+    refrescarTrasCambioDeDatos();
   }
 
   /* =========================================================
@@ -857,26 +1121,25 @@
   const elResumenCategorias = document.getElementById("cont-resumen-categorias");
   const elFiltroCategorias = document.getElementById("cont-filtro-categorias");
 
-  function renderResumen(tareasSemanaFiltradas) {
-    // El resumen total respeta el filtro activo; si no hay filtro, es la semana completa.
-    const total = tareasSemanaFiltradas.length;
-    const completadas = tareasSemanaFiltradas.filter((t) => {
-      const fecha = formatearFechaISO(fechaDeTareaEnSemana(t, estado.lunesVisible));
-      return !!(t.completadas && t.completadas[fecha]);
-    }).length;
+  // Recibe listas de "ocurrencias" { tarea, fechaISO }: una por cada aparición real de una tarea
+  // en el período visible (semana o mes). Así el mismo resumen sirve para ambas vistas.
+  function renderResumen(ocurrenciasFiltradas, ocurrenciasSinFiltro) {
+    function estaCompletada(ocurrencia) {
+      return !!(ocurrencia.tarea.completadas && ocurrencia.tarea.completadas[ocurrencia.fechaISO]);
+    }
+
+    // El resumen total respeta el filtro de categoría activo.
+    const total = ocurrenciasFiltradas.length;
+    const completadas = ocurrenciasFiltradas.filter(estaCompletada).length;
     elResumenTotal.textContent = `${completadas} / ${total}`;
 
-    // Desglose por categoría: siempre sobre TODAS las tareas de la semana (sin filtro),
+    // Desglose por categoría: siempre sobre TODAS las ocurrencias (sin filtro),
     // para que el resumen sirva de referencia aunque estés filtrando la vista.
-    const tareasSemanaCompleta = obtenerTareasSemanaSinFiltro();
     elResumenCategorias.innerHTML = "";
     estado.datos.categorias.forEach((categoria) => {
-      const deEstaCategoria = tareasSemanaCompleta.filter((t) => t.categoriaId === categoria.id);
+      const deEstaCategoria = ocurrenciasSinFiltro.filter((o) => o.tarea.categoriaId === categoria.id);
       if (deEstaCategoria.length === 0) return;
-      const hechas = deEstaCategoria.filter((t) => {
-        const fecha = formatearFechaISO(fechaDeTareaEnSemana(t, estado.lunesVisible));
-        return !!(t.completadas && t.completadas[fecha]);
-      }).length;
+      const hechas = deEstaCategoria.filter(estaCompletada).length;
 
       const chip = document.createElement("span");
       chip.className = "chip-categoria";
@@ -932,6 +1195,28 @@
   });
 
   /* =========================================================
+     6-bis. RENDER GENÉRICO SEGÚN LA VISTA ACTIVA
+     Todas las acciones que cambian datos (completar, guardar,
+     borrar, importar) llaman a refrescarTrasCambioDeDatos en vez
+     de renderTablero directamente, para que la vista Mes/Año y el
+     panel de detalle del día se mantengan al día también.
+     ========================================================= */
+  function renderVistaActual() {
+    if (estado.vista === "mes") {
+      renderMes();
+    } else if (estado.vista === "anio") {
+      renderAnio();
+    } else {
+      renderTablero();
+    }
+  }
+
+  function refrescarTrasCambioDeDatos() {
+    renderVistaActual();
+    if (!elModalDetalleDia.hidden) renderDetalleDia();
+  }
+
+  /* =========================================================
      7. MODAL: CREAR / EDITAR TAREA
      ========================================================= */
   const elModalTarea = document.getElementById("modal-tarea");
@@ -957,6 +1242,10 @@
   }
 
   function abrirModalTarea(tarea, diaSugerido) {
+    // Si el panel de detalle de un día estaba abierto (vista Mes), lo cerramos primero
+    // para que este modal no quede tapado detrás de su fondo oscuro.
+    elModalDetalleDia.hidden = true;
+
     elErrorForm.hidden = true;
     llenarSelectCategorias();
 
@@ -987,7 +1276,23 @@
     estado.tareaEditandoId = null;
   }
 
-  document.getElementById("btn-nueva-tarea").addEventListener("click", () => abrirModalTarea(null, 0));
+  document.getElementById("btn-nueva-tarea").addEventListener("click", () => {
+    // La fecha ancla y el día sugerido dependen de qué vista está activa.
+    if (estado.vista === "mes") {
+      const hoy = new Date();
+      const hoyEstaEnMesVisible =
+        hoy.getFullYear() === estado.mesVisible.getFullYear() && hoy.getMonth() === estado.mesVisible.getMonth();
+      const fechaReferencia = hoyEstaEnMesVisible ? hoy : primerDiaDelMes(estado.mesVisible);
+      estado.lunesAnclaCreacion = obtenerLunes(fechaReferencia);
+      abrirModalTarea(null, indiceDiaSemana(fechaReferencia));
+    } else if (estado.vista === "anio") {
+      estado.lunesAnclaCreacion = obtenerLunes(new Date());
+      abrirModalTarea(null, indiceDiaSemana(new Date()));
+    } else {
+      estado.lunesAnclaCreacion = estado.lunesVisible;
+      abrirModalTarea(null, 0);
+    }
+  });
   document.getElementById("btn-cancelar-tarea").addEventListener("click", cerrarModalTarea);
   elModalTarea.addEventListener("click", (evento) => {
     if (evento.target === elModalTarea) cerrarModalTarea();
@@ -1022,7 +1327,7 @@
         hora: elCampoHora.value || null,
         nota: elCampoNota.value.trim(),
         recurrente: elCampoRecurrente.checked,
-        fechaInicio: formatearFechaISO(estado.lunesVisible),
+        fechaInicio: formatearFechaISO(estado.lunesAnclaCreacion),
         completadas: {},
         excepciones: [],
       };
@@ -1031,7 +1336,7 @@
 
     guardarDatos();
     cerrarModalTarea();
-    renderTablero();
+    refrescarTrasCambioDeDatos();
   });
 
   /* ---- Agregar categoría nueva desde el formulario ---- */
@@ -1067,7 +1372,7 @@
     if (!tarea.recurrente) {
       estado.datos.tareas = estado.datos.tareas.filter((t) => t.id !== tarea.id);
       guardarDatos();
-      renderTablero();
+      refrescarTrasCambioDeDatos();
       return;
     }
     estado.tareaParaBorrar = { id: tarea.id, fecha: fechaOcurrenciaISO };
@@ -1089,7 +1394,7 @@
     }
     elModalBorrado.hidden = true;
     estado.tareaParaBorrar = null;
-    renderTablero();
+    refrescarTrasCambioDeDatos();
   });
 
   document.getElementById("btn-borrar-toda-serie").addEventListener("click", () => {
@@ -1098,7 +1403,7 @@
     guardarDatos();
     elModalBorrado.hidden = true;
     estado.tareaParaBorrar = null;
-    renderTablero();
+    refrescarTrasCambioDeDatos();
   });
 
   /* =========================================================
@@ -1156,13 +1461,323 @@
       guardarDatos();
       datosPendientesDeImportar = null;
       renderFiltroCategorias();
-      renderTablero();
+      refrescarTrasCambioDeDatos();
     }
     elModalImportar.hidden = true;
   });
 
   /* =========================================================
-     10. MODO OSCURO
+     10. VISTA MES
+     ========================================================= */
+  const elGridMes = document.getElementById("grid-mes");
+  const elTxtRangoMes = document.getElementById("txt-rango-mes");
+  const MAX_ETIQUETAS_VISIBLES = 3;
+
+  function renderMes() {
+    const primerDia = primerDiaDelMes(estado.mesVisible);
+    const ultimoDia = ultimoDiaDelMes(estado.mesVisible);
+    elTxtRangoMes.textContent = primerDia.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
+
+    // La grilla siempre completa semanas enteras: desde el lunes de la semana del día 1
+    // hasta el domingo de la semana del último día.
+    const inicioGrilla = sumarDias(primerDia, -indiceDiaSemana(primerDia));
+    const finGrilla = sumarDias(ultimoDia, 6 - indiceDiaSemana(ultimoDia));
+
+    elGridMes.innerHTML = "";
+    const hoy = new Date();
+    const ocurrenciasFiltradas = [];
+    const ocurrenciasSinFiltro = [];
+
+    let cursor = new Date(inicioGrilla);
+    while (cursor <= finGrilla) {
+      const fechaCelda = new Date(cursor);
+      const fechaISO = formatearFechaISO(fechaCelda);
+      const dentroDelMes = fechaCelda.getMonth() === estado.mesVisible.getMonth();
+      const tareasDelDia = tareasEnFecha(fechaCelda);
+
+      // El resumen del mes solo cuenta los días que pertenecen al mes (no el relleno de otros meses).
+      if (dentroDelMes) {
+        tareasDelDia.forEach((t) => {
+          ocurrenciasSinFiltro.push({ tarea: t, fechaISO });
+          if (!estado.categoriaFiltroId || t.categoriaId === estado.categoriaFiltroId) {
+            ocurrenciasFiltradas.push({ tarea: t, fechaISO });
+          }
+        });
+      }
+
+      const tareasVisiblesCelda = tareasDelDia.filter(
+        (t) => !estado.categoriaFiltroId || t.categoriaId === estado.categoriaFiltroId
+      );
+      elGridMes.appendChild(
+        crearCeldaMes(fechaCelda, dentroDelMes, esMismoDia(fechaCelda, hoy), tareasVisiblesCelda)
+      );
+
+      cursor = sumarDias(cursor, 1);
+    }
+
+    renderResumen(ocurrenciasFiltradas, ocurrenciasSinFiltro);
+  }
+
+  function crearCeldaMes(fecha, dentroDelMes, esHoy, tareasDelDia) {
+    const fechaISO = formatearFechaISO(fecha);
+
+    const celda = document.createElement("button");
+    celda.type = "button";
+    celda.className = "celda-dia-mes" + (esHoy ? " es-hoy" : "") + (dentroDelMes ? "" : " fuera-de-mes");
+    celda.addEventListener("click", () => abrirDetalleDia(fechaISO));
+
+    const numero = document.createElement("div");
+    numero.className = "numero-dia";
+    numero.textContent = fecha.getDate();
+    celda.appendChild(numero);
+
+    // Modo normal (pantallas grandes): hasta MAX_ETIQUETAS_VISIBLES etiquetas + "+N más".
+    const contNormal = document.createElement("div");
+    contNormal.className = "etiquetas-normal";
+    tareasDelDia.slice(0, MAX_ETIQUETAS_VISIBLES).forEach((tarea) => {
+      contNormal.appendChild(crearEtiquetaMini(tarea, fechaISO));
+    });
+    if (tareasDelDia.length > MAX_ETIQUETAS_VISIBLES) {
+      const mas = document.createElement("span");
+      mas.className = "mas-tareas-dia";
+      mas.textContent = `+${tareasDelDia.length - MAX_ETIQUETAS_VISIBLES} más`;
+      contNormal.appendChild(mas);
+    }
+    celda.appendChild(contNormal);
+
+    // Modo compacto (iPhone): solo puntos de color + cantidad de tareas.
+    if (tareasDelDia.length > 0) {
+      const contCompacto = document.createElement("div");
+      contCompacto.className = "etiquetas-compactas";
+      tareasDelDia.slice(0, 6).forEach((tarea) => {
+        const punto = document.createElement("span");
+        punto.className = "punto-color";
+        punto.style.background = buscarCategoria(tarea.categoriaId).color;
+        contCompacto.appendChild(punto);
+      });
+      const conteo = document.createElement("span");
+      conteo.className = "conteo-compacto";
+      conteo.textContent = `${tareasDelDia.length} tarea${tareasDelDia.length === 1 ? "" : "s"}`;
+      contCompacto.appendChild(conteo);
+      celda.appendChild(contCompacto);
+    }
+
+    return celda;
+  }
+
+  function crearEtiquetaMini(tarea, fechaISO) {
+    const categoria = buscarCategoria(tarea.categoriaId);
+    const completada = !!(tarea.completadas && tarea.completadas[fechaISO]);
+
+    const etiqueta = document.createElement("span");
+    etiqueta.className = "etiqueta-tarea-mini" + (completada ? " completada" : "");
+    etiqueta.style.borderLeftColor = categoria.color;
+    etiqueta.textContent = (completada ? "✓ " : "") + tarea.titulo;
+    return etiqueta;
+  }
+
+  document.getElementById("btn-mes-anterior").addEventListener("click", () => {
+    estado.mesVisible = new Date(estado.mesVisible.getFullYear(), estado.mesVisible.getMonth() - 1, 1);
+    renderMes();
+  });
+  document.getElementById("btn-mes-siguiente").addEventListener("click", () => {
+    estado.mesVisible = new Date(estado.mesVisible.getFullYear(), estado.mesVisible.getMonth() + 1, 1);
+    renderMes();
+  });
+  document.getElementById("btn-mes-hoy").addEventListener("click", () => {
+    estado.mesVisible = primerDiaDelMes(new Date());
+    renderMes();
+  });
+
+  /* =========================================================
+     11. PANEL DE DETALLE DE UN DÍA (usado por la vista Mes)
+     ========================================================= */
+  const elModalDetalleDia = document.getElementById("modal-detalle-dia");
+  const elTituloDetalleDia = document.getElementById("titulo-detalle-dia");
+  const elListaDetalleDia = document.getElementById("lista-detalle-dia");
+  const elAvisoDetalleDiaVacio = document.getElementById("aviso-detalle-dia-vacio");
+
+  function abrirDetalleDia(fechaISO) {
+    estado.fechaDiaDetalle = fechaISO;
+    renderDetalleDia();
+    elModalDetalleDia.hidden = false;
+  }
+
+  function renderDetalleDia() {
+    const fecha = new Date(estado.fechaDiaDetalle + "T00:00:00");
+    elTituloDetalleDia.textContent = fecha.toLocaleDateString("es-AR", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+
+    const tareasDelDia = tareasEnFecha(fecha)
+      .filter((t) => !estado.categoriaFiltroId || t.categoriaId === estado.categoriaFiltroId)
+      .sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99"));
+
+    elListaDetalleDia.innerHTML = "";
+    elAvisoDetalleDiaVacio.hidden = tareasDelDia.length > 0;
+    tareasDelDia.forEach((tarea) => {
+      elListaDetalleDia.appendChild(crearTarjetaTarea(tarea, fecha));
+    });
+  }
+
+  document.getElementById("btn-cerrar-detalle-dia").addEventListener("click", () => {
+    elModalDetalleDia.hidden = true;
+  });
+  elModalDetalleDia.addEventListener("click", (evento) => {
+    if (evento.target === elModalDetalleDia) elModalDetalleDia.hidden = true;
+  });
+
+  document.getElementById("btn-agregar-desde-detalle").addEventListener("click", () => {
+    const fecha = new Date(estado.fechaDiaDetalle + "T00:00:00");
+    estado.lunesAnclaCreacion = obtenerLunes(fecha);
+    abrirModalTarea(null, indiceDiaSemana(fecha));
+  });
+
+  /* =========================================================
+     12. VISTA AÑO
+     ========================================================= */
+  const elGridAnio = document.getElementById("grid-anio");
+  const elTxtRangoAnio = document.getElementById("txt-rango-anio");
+  const NOMBRES_MES = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+  ];
+
+  function renderAnio() {
+    elTxtRangoAnio.textContent = String(estado.anioVisible);
+    elGridAnio.innerHTML = "";
+    for (let mes = 0; mes < 12; mes++) {
+      elGridAnio.appendChild(crearMiniMes(estado.anioVisible, mes));
+    }
+  }
+
+  function crearMiniMes(anio, mes) {
+    const primerDia = new Date(anio, mes, 1);
+    const ultimoDia = new Date(anio, mes + 1, 0);
+    const inicioGrilla = sumarDias(primerDia, -indiceDiaSemana(primerDia));
+    const finGrilla = sumarDias(ultimoDia, 6 - indiceDiaSemana(ultimoDia));
+    const hoy = new Date();
+
+    const tarjeta = document.createElement("button");
+    tarjeta.type = "button";
+    tarjeta.className = "mini-mes";
+    tarjeta.addEventListener("click", () => {
+      estado.mesVisible = primerDia;
+      cambiarVista("mes");
+    });
+
+    const nombre = document.createElement("div");
+    nombre.className = "nombre-mes";
+    nombre.textContent = NOMBRES_MES[mes];
+    tarjeta.appendChild(nombre);
+
+    const grilla = document.createElement("div");
+    grilla.className = "mini-grid";
+
+    let completadasMes = 0;
+    let cursor = new Date(inicioGrilla);
+    while (cursor <= finGrilla) {
+      const fechaCelda = new Date(cursor);
+      const dentroDelMes = fechaCelda.getMonth() === mes;
+      const celda = document.createElement("div");
+      celda.className = "mini-celda" + (esMismoDia(fechaCelda, hoy) ? " es-hoy" : "");
+
+      if (dentroDelMes) {
+        const tareasDelDia = tareasEnFecha(fechaCelda);
+        if (tareasDelDia.length > 0) {
+          const fechaISO = formatearFechaISO(fechaCelda);
+          const completasDelDia = tareasDelDia.filter((t) => t.completadas && t.completadas[fechaISO]);
+          completadasMes += completasDelDia.length;
+
+          const punto = document.createElement("span");
+          punto.className =
+            "punto-estado-dia " + (completasDelDia.length === tareasDelDia.length ? "completo" : "pendiente");
+          celda.appendChild(punto);
+        }
+      }
+
+      grilla.appendChild(celda);
+      cursor = sumarDias(cursor, 1);
+    }
+    tarjeta.appendChild(grilla);
+
+    const total = document.createElement("div");
+    total.className = "total-completadas-mes";
+    total.textContent = `${completadasMes} tarea${completadasMes === 1 ? "" : "s"} completada${
+      completadasMes === 1 ? "" : "s"
+    } este mes`;
+    tarjeta.appendChild(total);
+
+    return tarjeta;
+  }
+
+  document.getElementById("btn-anio-anterior").addEventListener("click", () => {
+    estado.anioVisible -= 1;
+    renderAnio();
+  });
+  document.getElementById("btn-anio-siguiente").addEventListener("click", () => {
+    estado.anioVisible += 1;
+    renderAnio();
+  });
+  document.getElementById("btn-anio-hoy").addEventListener("click", () => {
+    estado.anioVisible = new Date().getFullYear();
+    renderAnio();
+  });
+
+  /* =========================================================
+     13. PESTAÑAS DE VISTA (Semana / Mes / Año)
+     ========================================================= */
+  const CLAVE_VISTA = "misemana_vista";
+  const elNavSemana = document.getElementById("nav-semana");
+  const elNavMes = document.getElementById("nav-mes");
+  const elNavAnio = document.getElementById("nav-anio");
+  const elVistaMes = document.getElementById("vista-mes");
+  const elVistaAnio = document.getElementById("vista-anio");
+  const elSeccionResumen = document.getElementById("seccion-resumen");
+  const elBotonesTab = [
+    document.getElementById("btn-tab-semana"),
+    document.getElementById("btn-tab-mes"),
+    document.getElementById("btn-tab-anio"),
+  ];
+
+  function actualizarVisibilidadVista() {
+    elNavSemana.hidden = estado.vista !== "semana";
+    elNavMes.hidden = estado.vista !== "mes";
+    elNavAnio.hidden = estado.vista !== "anio";
+
+    elTablero.hidden = estado.vista !== "semana";
+    elVistaMes.hidden = estado.vista !== "mes";
+    elVistaAnio.hidden = estado.vista !== "anio";
+
+    // El resumen y el filtro por categoría solo tienen sentido en Semana y Mes.
+    const mostrarResumenYFiltro = estado.vista !== "anio";
+    elSeccionResumen.hidden = !mostrarResumenYFiltro;
+    elFiltroCategorias.hidden = !mostrarResumenYFiltro;
+
+    elBotonesTab.forEach((btn) => btn.classList.toggle("activo", btn.dataset.vista === estado.vista));
+  }
+
+  function cambiarVista(nuevaVista) {
+    estado.vista = nuevaVista;
+    localStorage.setItem(CLAVE_VISTA, nuevaVista);
+    actualizarVisibilidadVista();
+    renderVistaActual();
+  }
+
+  elBotonesTab.forEach((btn) => {
+    btn.addEventListener("click", () => cambiarVista(btn.dataset.vista));
+  });
+
+  function inicializarVista() {
+    const guardada = localStorage.getItem(CLAVE_VISTA);
+    estado.vista = guardada === "mes" || guardada === "anio" ? guardada : "semana";
+    actualizarVisibilidadVista();
+  }
+
+  /* =========================================================
+     14. MODO OSCURO
      ========================================================= */
   const CLAVE_TEMA = "misemana_tema";
   const elChkTema = document.getElementById("chk-tema");
@@ -1192,12 +1807,13 @@
   });
 
   /* =========================================================
-     11. INICIALIZACIÓN
+     15. INICIALIZACIÓN
      ========================================================= */
   function iniciar() {
     inicializarTema();
+    inicializarVista();
     renderFiltroCategorias();
-    renderTablero();
+    renderVistaActual();
   }
 
   iniciar();
