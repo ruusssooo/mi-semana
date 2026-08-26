@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mi Semana</title>
+<style>
+  /* =========================================================
+     VARIABLES DE COLOR (modo claro y modo oscuro)
+     Cambiar estas variables cambia toda la app al instante.
+     ========================================================= */
+  :root {
+    --bg: #f5f5f4;
+    --bg-tarjeta: #ffffff;
+    --bg-columna: #ffffff;
+    --bg-columna-hoy: #fff8ef;
+    --borde: #e5e5e4;
+    --borde-hoy: #f59e0b;
+    --texto: #1c1c1b;
+    --texto-suave: #6b6b68;
+    --texto-atenuado: #a3a3a1;
+    --sombra: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --acento: #2563eb;
+    --peligro: #dc2626;
+    --radio: 10px;
+  }
+
+  /* Modo oscuro automático si el sistema lo pide y el usuario no eligió nada */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+      --bg: #17181a;
+      --bg-tarjeta: #232427;
+      --bg-columna: #1e1f22;
+      --bg-columna-hoy: #2a2410;
+      --borde: #35363a;
+      --borde-hoy: #f59e0b;
+      --texto: #f1f1ef;
+      --texto-suave: #b5b5b2;
+      --texto-atenuado: #75767a;
+      --sombra: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  /* Modo oscuro forzado por el interruptor (gana siempre) */
+  :root[data-tema="oscuro"] {
+    --bg: #17181a;
+    --bg-tarjeta: #232427;
+    --bg-columna: #1e1f22;
+    --bg-columna-hoy: #2a2410;
+    --borde: #35363a;
+    --borde-hoy: #f59e0b;
+    --texto: #f1f1ef;
+    --texto-suave: #b5b5b2;
+    --texto-atenuado: #75767a;
+    --sombra: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--texto);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color .2s ease, color .2s ease;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 40px;
+  }
+
+  a { color: inherit; }
+
+  /* ---------- Encabezado ---------- */
+  header.app-header {
+    padding: 16px 16px 8px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .fila-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .acciones-header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--borde);
+    background: var(--bg-tarjeta);
+    color: var(--texto);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: background-color .15s ease, border-color .15s ease, opacity .15s ease;
+  }
+  button:hover { border-color: var(--texto-atenuado); }
+  button:active { opacity: .8; }
+
+  button.primario {
+    background: var(--acento);
+    border-color: var(--acento);
+    color: #fff;
+  }
+  button.primario:hover { border-color: var(--acento); opacity: .92; }
+
+  button.icono {
+    padding: 8px 10px;
+    line-height: 1;
+  }
+
+  /* Interruptor modo oscuro */
+  .interruptor-tema {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--texto-suave);
+  }
+  .interruptor-tema input { cursor: pointer; }
+
+  /* ---------- Navegación de semana ---------- */
+  .nav-semana {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 14px 0 6px;
+  }
+  .nav-semana .rango-fechas {
+    font-size: 15px;
+    font-weight: 600;
+    min-width: 190px;
+    text-align: center;
+  }
+
+  /* ---------- Resumen ---------- */
+  .resumen {
+    max-width: 1100px;
+    margin: 10px auto 0;
+    padding: 0 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .resumen-total {
+    background: var(--bg-tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    padding: 10px 14px;
+    font-size: 14px;
+    box-shadow: var(--sombra);
+  }
+  .resumen-total strong { font-size: 16px; }
+
+  .resumen-categorias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip-categoria {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    padding: 5px 10px 5px 8px;
+    font-size: 12.5px;
+    color: var(--texto-suave);
+  }
+  .punto-color {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Filtro por categoría ---------- */
+  .filtro-categorias {
+    max-width: 1100px;
+    margin: 10px auto 0;
+    padding: 0 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filtro-btn {
+    border-radius: 999px;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filtro-btn.activo {
+    background: var(--texto);
+    color: var(--bg);
+    border-color: var(--texto);
+  }
+
+  /* ---------- Tablero semanal ---------- */
+  .tablero {
+    max-width: 1100px;
+    margin: 16px auto 0;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(210px, 1fr));
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding-bottom: 8px;
+  }
+
+  .columna-dia {
+    background: var(--bg-columna);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    padding: 10px;
+    min-height: 140px;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+
+  .columna-dia.es-hoy {
+    background: var(--bg-columna-hoy);
+    border-color: var(--borde-hoy);
+  }
+
+  .cabecera-columna {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .cabecera-columna .nombre-dia {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+  }
+  .cabecera-columna .fecha-dia {
+    font-size: 12px;
+    color: var(--texto-suave);
+  }
+
+  .btn-agregar-dia {
+    width: 100%;
+    padding: 6px;
+    font-size: 13px;
+    border-style: dashed;
+    color: var(--texto-suave);
+    background: transparent;
+  }
+
+  /* ---------- Tarjeta de tarea ---------- */
+  .tarjeta-tarea {
+    background: var(--bg-tarjeta);
+    border: 1px solid var(--borde);
+    border-left-width: 4px;
+    border-radius: 8px;
+    padding: 8px 10px;
+    box-shadow: var(--sombra);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    transition: opacity .15s ease;
+  }
+
+  .tarjeta-tarea input[type="checkbox"] {
+    margin-top: 3px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .tarjeta-tarea .cuerpo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tarjeta-tarea .titulo-tarea {
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .tarjeta-tarea .meta-tarea {
+    font-size: 12px;
+    color: var(--texto-suave);
+    margin-top: 2px;
+  }
+  .tarjeta-tarea .nota-tarea {
+    font-size: 12px;
+    color: var(--texto-suave);
+    margin-top: 4px;
+    word-break: break-word;
+  }
+
+  .tarjeta-tarea.completada .titulo-tarea,
+  .tarjeta-tarea.completada .nota-tarea {
+    text-decoration: line-through;
+    color: var(--texto-atenuado);
+  }
+  .tarjeta-tarea.completada {
+    opacity: .6;
+  }
+
+  .acciones-tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .acciones-tarjeta button {
+    border: none;
+    background: transparent;
+    padding: 2px 4px;
+    font-size: 13px;
+    color: var(--texto-atenuado);
+  }
+  .acciones-tarjeta button:hover { color: var(--texto); }
+
+  /* ---------- Modal (formulario) ---------- */
+  .fondo-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+    padding: 0;
+  }
+  .fondo-modal[hidden] { display: none; }
+
+  .caja-modal {
+    background: var(--bg-tarjeta);
+    color: var(--texto);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 16px 16px 0 0;
+    padding: 18px 18px calc(18px + env(safe-area-inset-bottom));
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  @media (min-width: 640px) {
+    .fondo-modal { align-items: center; }
+    .caja-modal { border-radius: 16px; }
+  }
+
+  .caja-modal h2 {
+    margin: 0 0 14px;
+    font-size: 18px;
+  }
+
+  .campo {
+    margin-bottom: 12px;
+  }
+  .campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--texto-suave);
+  }
+  .campo input[type="text"],
+  .campo input[type="time"],
+  .campo input[type="date"],
+  .campo select,
+  .campo textarea {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--borde);
+    background: var(--bg);
+    color: var(--texto);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .campo textarea { resize: vertical; min-height: 50px; }
+
+  .fila-dos {
+    display: flex;
+    gap: 10px;
+  }
+  .fila-dos > .campo { flex: 1; }
+
+  .campo-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .campo-checkbox label { margin: 0; font-weight: 500; color: var(--texto); }
+
+  .fila-nueva-categoria {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .fila-nueva-categoria input[type="text"] { flex: 1; }
+  .fila-nueva-categoria input[type="color"] {
+    width: 38px;
+    height: 34px;
+    padding: 2px;
+    border-radius: 8px;
+    border: 1px solid var(--borde);
+    background: var(--bg);
+  }
+
+  .acciones-modal {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .error-form {
+    color: var(--peligro);
+    font-size: 13px;
+    margin-top: -4px;
+    margin-bottom: 10px;
+  }
+  .error-form[hidden] { display: none; }
+
+  .aviso-vacio {
+    font-size: 12px;
+    color: var(--texto-atenuado);
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  input[type="file"] { display: none; }
+
+  /* ---------- Responsive: iPhone ---------- */
+  @media (max-width: 720px) {
+    .tablero {
+      grid-auto-flow: column;
+      grid-template-columns: none;
+      grid-auto-columns: 82%;
+    }
+    h1 { font-size: 19px; }
+    .nav-semana .rango-fechas { min-width: 150px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="fila-titulo">
+      <h1>📅 Mi Semana</h1>
+      <div class="acciones-header">
+        <label class="interruptor-tema">
+          <input type="checkbox" id="chk-tema">
+          Modo oscuro
+        </label>
+        <button id="btn-exportar" class="icono" title="Exportar datos">⬇️ Exportar</button>
+        <button id="btn-importar" class="icono" title="Importar datos">⬆️ Importar</button>
+        <input type="file" id="input-importar" accept="application/json">
+        <button id="btn-nueva-tarea" class="primario">+ Nueva tarea</button>
+      </div>
+    </div>
+
+    <div class="nav-semana">
+      <button id="btn-semana-anterior" class="icono" title="Semana anterior">←</button>
+      <span class="rango-fechas" id="txt-rango-fechas"></span>
+      <button id="btn-hoy">Hoy</button>
+      <button id="btn-semana-siguiente" class="icono" title="Semana siguiente">→</button>
+    </div>
+  </header>
+
+  <section class="resumen">
+    <div class="resumen-total">
+      Completadas: <strong id="txt-resumen-total">0 / 0</strong>
+    </div>
+    <div class="resumen-categorias" id="cont-resumen-categorias"></div>
+  </section>
+
+  <section class="filtro-categorias" id="cont-filtro-categorias"></section>
+
+  <main class="tablero" id="tablero"></main>
+
+  <!-- ================= Modal: crear / editar tarea ================= -->
+  <div class="fondo-modal" id="modal-tarea" hidden>
+    <div class="caja-modal">
+      <h2 id="titulo-modal-tarea">Nueva tarea</h2>
+      <form id="form-tarea">
+        <input type="hidden" id="campo-tarea-id">
+
+        <div class="campo">
+          <label for="campo-titulo">Título</label>
+          <input type="text" id="campo-titulo" maxlength="80" required placeholder="Ej. Entrenar guardia">
+        </div>
+
+        <div class="fila-dos">
+          <div class="campo">
+            <label for="campo-categoria">Categoría</label>
+            <select id="campo-categoria"></select>
+          </div>
+          <div class="campo">
+            <label for="campo-dia">Día</label>
+            <select id="campo-dia">
+              <option value="0">Lunes</option>
+              <option value="1">Martes</option>
+              <option value="2">Miércoles</option>
+              <option value="3">Jueves</option>
+              <option value="4">Viernes</option>
+              <option value="5">Sábado</option>
+              <option value="6">Domingo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fila-dos">
+          <div class="campo">
+            <label for="campo-hora">Hora (opcional)</label>
+            <input type="time" id="campo-hora">
+          </div>
+          <div class="campo campo-checkbox" style="margin-top: 22px;">
+            <input type="checkbox" id="campo-recurrente">
+            <label for="campo-recurrente">Repetir cada semana</label>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="campo-nota">Nota (opcional)</label>
+          <textarea id="campo-nota" maxlength="300" placeholder="Detalles, recordatorios..."></textarea>
+        </div>
+
+        <div class="campo">
+          <label>Agregar categoría nueva</label>
+          <div class="fila-nueva-categoria">
+            <input type="text" id="campo-nueva-categoria-nombre" maxlength="24" placeholder="Nombre de la categoría">
+            <input type="color" id="campo-nueva-categoria-color" value="#0ea5e9">
+            <button type="button" id="btn-agregar-categoria">Agregar</button>
+          </div>
+        </div>
+
+        <p class="error-form" id="error-form-tarea" hidden></p>
+
+        <div class="acciones-modal">
+          <button type="button" id="btn-cancelar-tarea">Cancelar</button>
+          <button type="submit" class="primario">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= Modal: confirmar borrado de recurrente ================= -->
+  <div class="fondo-modal" id="modal-confirmar-borrado" hidden>
+    <div class="caja-modal">
+      <h2>Eliminar tarea repetida</h2>
+      <p>Esta tarea se repite cada semana. ¿Qué querés borrar?</p>
+      <div class="acciones-modal" style="justify-content: flex-start; flex-wrap: wrap;">
+        <button id="btn-borrar-solo-esta">Solo esta semana</button>
+        <button id="btn-borrar-toda-serie" style="border-color: var(--peligro); color: var(--peligro);">Toda la serie</button>
+        <button id="btn-cancelar-borrado">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Modal: confirmar importación ================= -->
+  <div class="fondo-modal" id="modal-confirmar-importar" hidden>
+    <div class="caja-modal">
+      <h2>Importar datos</h2>
+      <p>Esto va a reemplazar todas tus tareas y categorías actuales por las del archivo. ¿Continuar?</p>
+      <div class="acciones-modal">
+        <button id="btn-cancelar-importar">Cancelar</button>
+        <button id="btn-confirmar-importar" class="primario">Sí, reemplazar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================================================
+     1. DATOS Y ALMACENAMIENTO
+     Todo se guarda en localStorage bajo una sola clave.
+     ========================================================= */
+  const CLAVE_ALMACENAMIENTO = "misemana_v1";
+  const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  const DIAS_CORTOS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+  // Categorías fijas: no se pueden borrar ni recolorear desde la interfaz.
+  const CATEGORIAS_FIJAS = [
+    { id: "universidad", nombre: "Universidad", color: "#2563eb", fija: true },
+    { id: "gimnasio", nombre: "Gimnasio", color: "#f97316", fija: true },
+    { id: "jiujitsu", nombre: "Jiu Jitsu", color: "#8b5cf6", fija: true },
+    { id: "personal", nombre: "Personal", color: "#16a34a", fija: true },
+  ];
+
+  function datosPorDefecto() {
+    return {
+      version: 1,
+      categorias: CATEGORIAS_FIJAS.map((c) => ({ ...c })),
+      tareas: [],
+    };
+  }
+
+  function cargarDatos() {
+    const crudo = localStorage.getItem(CLAVE_ALMACENAMIENTO);
+    if (!crudo) return datosPorDefecto();
+    try {
+      const datos = JSON.parse(crudo);
+      if (!datos || !Array.isArray(datos.categorias) || !Array.isArray(datos.tareas)) {
+        return datosPorDefecto();
+      }
+      return datos;
+    } catch (e) {
+      // Si el JSON guardado está corrupto, arrancamos de cero en vez de romper la página.
+      return datosPorDefecto();
+    }
+  }
+
+  function guardarDatos() {
+    localStorage.setItem(CLAVE_ALMACENAMIENTO, JSON.stringify(estado.datos));
+  }
+
+  const estado = {
+    datos: cargarDatos(),
+    lunesVisible: obtenerLunes(new Date()),
+    categoriaFiltroId: null, // null = ver todas las categorías
+    tareaEditandoId: null,
+    tareaParaBorrar: null,
+    diaSugeridoAlCrear: 0,
+  };
+
+  /* =========================================================
+     2. UTILIDADES DE FECHA
+     Todas las fechas se manejan como texto "AAAA-MM-DD" en
+     hora local, para evitar líos con zonas horarias.
+     ========================================================= */
+  function formatearFechaISO(fecha) {
+    const y = fecha.getFullYear();
+    const m = String(fecha.getMonth() + 1).padStart(2, "0");
+    const d = String(fecha.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function obtenerLunes(fecha) {
+    const copia = new Date(fecha);
+    const diaSemanaJs = copia.getDay(); // 0=domingo ... 6=sábado
+    const offset = diaSemanaJs === 0 ? -6 : 1 - diaSemanaJs; // llevar al lunes de esa semana
+    copia.setDate(copia.getDate() + offset);
+    copia.setHours(0, 0, 0, 0);
+    return copia;
+  }
+
+  function sumarDias(fecha, cantidad) {
+    const copia = new Date(fecha);
+    copia.setDate(copia.getDate() + cantidad);
+    return copia;
+  }
+
+  function esMismoDia(fechaA, fechaB) {
+    return formatearFechaISO(fechaA) === formatearFechaISO(fechaB);
+  }
+
+  function formatearRangoSemana(lunes) {
+    const domingo = sumarDias(lunes, 6);
+    const opciones = { day: "numeric", month: "short" };
+    const textoInicio = lunes.toLocaleDateString("es-AR", opciones);
+    const textoFin = domingo.toLocaleDateString("es-AR", { ...opciones, year: "numeric" });
+    return `${textoInicio} – ${textoFin}`;
+  }
+
+  /* =========================================================
+     3. UTILIDADES DE CATEGORÍAS Y TAREAS
+     ========================================================= */
+  function buscarCategoria(id) {
+    return estado.datos.categorias.find((c) => c.id === id) || estado.datos.categorias[0];
+  }
+
+  function generarId() {
+    return `id_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  // Devuelve la fecha real (Date) en la que cae una tarea, dentro de la semana visible.
+  function fechaDeTareaEnSemana(tarea, lunesSemana) {
+    return sumarDias(lunesSemana, tarea.diaSemana);
+  }
+
+  // ¿La tarea (recurrente o no) debe mostrarse en la semana cuyo lunes es lunesSemana?
+  function tareaAplicaEnSemana(tarea, lunesSemana) {
+    const lunesInicio = obtenerLunes(new Date(tarea.fechaInicio + "T00:00:00"));
+    if (lunesSemana < lunesInicio) return false;
+    if (!tarea.recurrente && formatearFechaISO(lunesSemana) !== formatearFechaISO(lunesInicio)) {
+      return false;
+    }
+    const fechaOcurrencia = formatearFechaISO(fechaDeTareaEnSemana(tarea, lunesSemana));
+    if (tarea.excepciones && tarea.excepciones.includes(fechaOcurrencia)) return false;
+    return true;
+  }
+
+  // Lista de tareas visibles en la semana actual, ya filtradas por categoría si corresponde.
+  function tareasDeLaSemana(lunesSemana) {
+    return estado.datos.tareas
+      .filter((t) => tareaAplicaEnSemana(t, lunesSemana))
+      .filter((t) => !estado.categoriaFiltroId || t.categoriaId === estado.categoriaFiltroId);
+  }
+
+  /* =========================================================
+     4. RENDER: TABLERO SEMANAL
+     ========================================================= */
+  const elTablero = document.getElementById("tablero");
+  const elRangoFechas = document.getElementById("txt-rango-fechas");
+
+  function renderTablero() {
+    elRangoFechas.textContent = formatearRangoSemana(estado.lunesVisible);
+    elTablero.innerHTML = "";
+
+    const hoy = new Date();
+    const tareasSemana = tareasDeLaSemana(estado.lunesVisible);
+
+    for (let dia = 0; dia < 7; dia++) {
+      const fechaColumna = sumarDias(estado.lunesVisible, dia);
+      const esHoy = esMismoDia(fechaColumna, hoy);
+
+      const columna = document.createElement("div");
+      columna.className = "columna-dia" + (esHoy ? " es-hoy" : "");
+
+      const cabecera = document.createElement("div");
+      cabecera.className = "cabecera-columna";
+      cabecera.innerHTML = `
+        <span class="nombre-dia">${DIAS_CORTOS[dia]}</span>
+        <span class="fecha-dia">${fechaColumna.getDate()}/${fechaColumna.getMonth() + 1}</span>
+      `;
+      columna.appendChild(cabecera);
+
+      const tareasDelDia = tareasSemana
+        .filter((t) => t.diaSemana === dia)
+        .sort((a, b) => (a.hora || "99:99").localeCompare(b.hora || "99:99"));
+
+      if (tareasDelDia.length === 0) {
+        const vacio = document.createElement("p");
+        vacio.className = "aviso-vacio";
+        vacio.textContent = "Sin tareas";
+        columna.appendChild(vacio);
+      }
+
+      tareasDelDia.forEach((tarea) => {
+        columna.appendChild(crearTarjetaTarea(tarea, fechaColumna));
+      });
+
+      const btnAgregar = document.createElement("button");
+      btnAgregar.className = "btn-agregar-dia";
+      btnAgregar.type = "button";
+      btnAgregar.textContent = "+ Agregar";
+      btnAgregar.addEventListener("click", () => abrirModalTarea(null, dia));
+      columna.appendChild(btnAgregar);
+
+      elTablero.appendChild(columna);
+    }
+
+    renderResumen(tareasSemana);
+  }
+
+  function crearTarjetaTarea(tarea, fechaColumna) {
+    const categoria = buscarCategoria(tarea.categoriaId);
+    const fechaOcurrenciaISO = formatearFechaISO(fechaColumna);
+    const completada = !!(tarea.completadas && tarea.completadas[fechaOcurrenciaISO]);
+
+    const tarjeta = document.createElement("div");
+    tarjeta.className = "tarjeta-tarea" + (completada ? " completada" : "");
+    tarjeta.style.borderLeftColor = categoria.color;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = completada;
+    checkbox.addEventListener("change", () => {
+      alternarCompletada(tarea.id, fechaOcurrenciaISO);
+    });
+
+    const cuerpo = document.createElement("div");
+    cuerpo.className = "cuerpo";
+
+    const titulo = document.createElement("div");
+    titulo.className = "titulo-tarea";
+    titulo.textContent = tarea.titulo;
+    cuerpo.appendChild(titulo);
+
+    const metaPartes = [categoria.nombre];
+    if (tarea.hora) metaPartes.push(tarea.hora);
+    if (tarea.recurrente) metaPartes.push("🔁 semanal");
+    const meta = document.createElement("div");
+    meta.className = "meta-tarea";
+    meta.textContent = metaPartes.join(" · ");
+    cuerpo.appendChild(meta);
+
+    if (tarea.nota) {
+      const nota = document.createElement("div");
+      nota.className = "nota-tarea";
+      nota.textContent = tarea.nota;
+      cuerpo.appendChild(nota);
+    }
+
+    const acciones = document.createElement("div");
+    acciones.className = "acciones-tarjeta";
+
+    const btnEditar = document.createElement("button");
+    btnEditar.type = "button";
+    btnEditar.title = "Editar";
+    btnEditar.textContent = "✏️";
+    btnEditar.addEventListener("click", () => abrirModalTarea(tarea));
+
+    const btnBorrar = document.createElement("button");
+    btnBorrar.type = "button";
+    btnBorrar.title = "Eliminar";
+    btnBorrar.textContent = "🗑️";
+    btnBorrar.addEventListener("click", () => pedirBorrado(tarea, fechaOcurrenciaISO));
+
+    acciones.appendChild(btnEditar);
+    acciones.appendChild(btnBorrar);
+
+    tarjeta.appendChild(checkbox);
+    tarjeta.appendChild(cuerpo);
+    tarjeta.appendChild(acciones);
+
+    return tarjeta;
+  }
+
+  function alternarCompletada(tareaId, fechaOcurrenciaISO) {
+    const tarea = estado.datos.tareas.find((t) => t.id === tareaId);
+    if (!tarea) return;
+    if (!tarea.completadas) tarea.completadas = {};
+    tarea.completadas[fechaOcurrenciaISO] = !tarea.completadas[fechaOcurrenciaISO];
+    guardarDatos();
+    renderTablero();
+  }
+
+  /* =========================================================
+     5. RESUMEN Y FILTRO POR CATEGORÍA
+     ========================================================= */
+  const elResumenTotal = document.getElementById("txt-resumen-total");
+  const elResumenCategorias = document.getElementById("cont-resumen-categorias");
+  const elFiltroCategorias = document.getElementById("cont-filtro-categorias");
+
+  function renderResumen(tareasSemanaFiltradas) {
+    // El resumen total respeta el filtro activo; si no hay filtro, es la semana completa.
+    const total = tareasSemanaFiltradas.length;
+    const completadas = tareasSemanaFiltradas.filter((t) => {
+      const fecha = formatearFechaISO(fechaDeTareaEnSemana(t, estado.lunesVisible));
+      return !!(t.completadas && t.completadas[fecha]);
+    }).length;
+    elResumenTotal.textContent = `${completadas} / ${total}`;
+
+    // Desglose por categoría: siempre sobre TODAS las tareas de la semana (sin filtro),
+    // para que el resumen sirva de referencia aunque estés filtrando la vista.
+    const tareasSemanaCompleta = obtenerTareasSemanaSinFiltro();
+    elResumenCategorias.innerHTML = "";
+    estado.datos.categorias.forEach((categoria) => {
+      const deEstaCategoria = tareasSemanaCompleta.filter((t) => t.categoriaId === categoria.id);
+      if (deEstaCategoria.length === 0) return;
+      const hechas = deEstaCategoria.filter((t) => {
+        const fecha = formatearFechaISO(fechaDeTareaEnSemana(t, estado.lunesVisible));
+        return !!(t.completadas && t.completadas[fecha]);
+      }).length;
+
+      const chip = document.createElement("span");
+      chip.className = "chip-categoria";
+      chip.innerHTML = `<span class="punto-color" style="background:${categoria.color}"></span>${categoria.nombre}: ${hechas}/${deEstaCategoria.length}`;
+      elResumenCategorias.appendChild(chip);
+    });
+  }
+
+  function obtenerTareasSemanaSinFiltro() {
+    return estado.datos.tareas.filter((t) => tareaAplicaEnSemana(t, estado.lunesVisible));
+  }
+
+  function renderFiltroCategorias() {
+    elFiltroCategorias.innerHTML = "";
+
+    const btnTodas = document.createElement("button");
+    btnTodas.className = "filtro-btn" + (estado.categoriaFiltroId === null ? " activo" : "");
+    btnTodas.textContent = "Todas";
+    btnTodas.addEventListener("click", () => {
+      estado.categoriaFiltroId = null;
+      renderFiltroCategorias();
+      renderTablero();
+    });
+    elFiltroCategorias.appendChild(btnTodas);
+
+    estado.datos.categorias.forEach((categoria) => {
+      const btn = document.createElement("button");
+      btn.className = "filtro-btn" + (estado.categoriaFiltroId === categoria.id ? " activo" : "");
+      btn.innerHTML = `<span class="punto-color" style="background:${categoria.color}"></span>${categoria.nombre}`;
+      btn.addEventListener("click", () => {
+        estado.categoriaFiltroId = categoria.id;
+        renderFiltroCategorias();
+        renderTablero();
+      });
+      elFiltroCategorias.appendChild(btn);
+    });
+  }
+
+  /* =========================================================
+     6. NAVEGACIÓN DE SEMANA
+     ========================================================= */
+  document.getElementById("btn-semana-anterior").addEventListener("click", () => {
+    estado.lunesVisible = sumarDias(estado.lunesVisible, -7);
+    renderTablero();
+  });
+  document.getElementById("btn-semana-siguiente").addEventListener("click", () => {
+    estado.lunesVisible = sumarDias(estado.lunesVisible, 7);
+    renderTablero();
+  });
+  document.getElementById("btn-hoy").addEventListener("click", () => {
+    estado.lunesVisible = obtenerLunes(new Date());
+    renderTablero();
+  });
+
+  /* =========================================================
+     7. MODAL: CREAR / EDITAR TAREA
+     ========================================================= */
+  const elModalTarea = document.getElementById("modal-tarea");
+  const elFormTarea = document.getElementById("form-tarea");
+  const elTituloModalTarea = document.getElementById("titulo-modal-tarea");
+  const elCampoId = document.getElementById("campo-tarea-id");
+  const elCampoTitulo = document.getElementById("campo-titulo");
+  const elCampoCategoria = document.getElementById("campo-categoria");
+  const elCampoDia = document.getElementById("campo-dia");
+  const elCampoHora = document.getElementById("campo-hora");
+  const elCampoRecurrente = document.getElementById("campo-recurrente");
+  const elCampoNota = document.getElementById("campo-nota");
+  const elErrorForm = document.getElementById("error-form-tarea");
+
+  function llenarSelectCategorias() {
+    elCampoCategoria.innerHTML = "";
+    estado.datos.categorias.forEach((categoria) => {
+      const opcion = document.createElement("option");
+      opcion.value = categoria.id;
+      opcion.textContent = categoria.nombre;
+      elCampoCategoria.appendChild(opcion);
+    });
+  }
+
+  function abrirModalTarea(tarea, diaSugerido) {
+    elErrorForm.hidden = true;
+    llenarSelectCategorias();
+
+    if (tarea) {
+      estado.tareaEditandoId = tarea.id;
+      elTituloModalTarea.textContent = "Editar tarea";
+      elCampoId.value = tarea.id;
+      elCampoTitulo.value = tarea.titulo;
+      elCampoCategoria.value = tarea.categoriaId;
+      elCampoDia.value = String(tarea.diaSemana);
+      elCampoHora.value = tarea.hora || "";
+      elCampoRecurrente.checked = !!tarea.recurrente;
+      elCampoNota.value = tarea.nota || "";
+    } else {
+      estado.tareaEditandoId = null;
+      elTituloModalTarea.textContent = "Nueva tarea";
+      elCampoId.value = "";
+      elFormTarea.reset();
+      elCampoDia.value = String(diaSugerido != null ? diaSugerido : 0);
+    }
+
+    elModalTarea.hidden = false;
+    elCampoTitulo.focus();
+  }
+
+  function cerrarModalTarea() {
+    elModalTarea.hidden = true;
+    estado.tareaEditandoId = null;
+  }
+
+  document.getElementById("btn-nueva-tarea").addEventListener("click", () => abrirModalTarea(null, 0));
+  document.getElementById("btn-cancelar-tarea").addEventListener("click", cerrarModalTarea);
+  elModalTarea.addEventListener("click", (evento) => {
+    if (evento.target === elModalTarea) cerrarModalTarea();
+  });
+
+  elFormTarea.addEventListener("submit", (evento) => {
+    evento.preventDefault();
+
+    const titulo = elCampoTitulo.value.trim();
+    if (!titulo) {
+      elErrorForm.textContent = "El título es obligatorio.";
+      elErrorForm.hidden = false;
+      return;
+    }
+
+    if (estado.tareaEditandoId) {
+      const tarea = estado.datos.tareas.find((t) => t.id === estado.tareaEditandoId);
+      if (tarea) {
+        tarea.titulo = titulo;
+        tarea.categoriaId = elCampoCategoria.value;
+        tarea.diaSemana = Number(elCampoDia.value);
+        tarea.hora = elCampoHora.value || null;
+        tarea.recurrente = elCampoRecurrente.checked;
+        tarea.nota = elCampoNota.value.trim();
+      }
+    } else {
+      const nuevaTarea = {
+        id: generarId(),
+        titulo,
+        categoriaId: elCampoCategoria.value,
+        diaSemana: Number(elCampoDia.value),
+        hora: elCampoHora.value || null,
+        nota: elCampoNota.value.trim(),
+        recurrente: elCampoRecurrente.checked,
+        fechaInicio: formatearFechaISO(estado.lunesVisible),
+        completadas: {},
+        excepciones: [],
+      };
+      estado.datos.tareas.push(nuevaTarea);
+    }
+
+    guardarDatos();
+    cerrarModalTarea();
+    renderTablero();
+  });
+
+  /* ---- Agregar categoría nueva desde el formulario ---- */
+  document.getElementById("btn-agregar-categoria").addEventListener("click", () => {
+    const elNombre = document.getElementById("campo-nueva-categoria-nombre");
+    const elColor = document.getElementById("campo-nueva-categoria-color");
+    const nombre = elNombre.value.trim();
+
+    if (!nombre) {
+      elErrorForm.textContent = "Escribí un nombre para la nueva categoría.";
+      elErrorForm.hidden = false;
+      return;
+    }
+
+    const id = "cat_" + generarId();
+    estado.datos.categorias.push({ id, nombre, color: elColor.value, fija: false });
+    guardarDatos();
+
+    llenarSelectCategorias();
+    elCampoCategoria.value = id;
+    elNombre.value = "";
+    elErrorForm.hidden = true;
+
+    renderFiltroCategorias();
+  });
+
+  /* =========================================================
+     8. ELIMINAR TAREA (con manejo de recurrencia)
+     ========================================================= */
+  const elModalBorrado = document.getElementById("modal-confirmar-borrado");
+
+  function pedirBorrado(tarea, fechaOcurrenciaISO) {
+    if (!tarea.recurrente) {
+      estado.datos.tareas = estado.datos.tareas.filter((t) => t.id !== tarea.id);
+      guardarDatos();
+      renderTablero();
+      return;
+    }
+    estado.tareaParaBorrar = { id: tarea.id, fecha: fechaOcurrenciaISO };
+    elModalBorrado.hidden = false;
+  }
+
+  document.getElementById("btn-cancelar-borrado").addEventListener("click", () => {
+    elModalBorrado.hidden = true;
+    estado.tareaParaBorrar = null;
+  });
+
+  document.getElementById("btn-borrar-solo-esta").addEventListener("click", () => {
+    const { id, fecha } = estado.tareaParaBorrar;
+    const tarea = estado.datos.tareas.find((t) => t.id === id);
+    if (tarea) {
+      if (!tarea.excepciones) tarea.excepciones = [];
+      tarea.excepciones.push(fecha);
+      guardarDatos();
+    }
+    elModalBorrado.hidden = true;
+    estado.tareaParaBorrar = null;
+    renderTablero();
+  });
+
+  document.getElementById("btn-borrar-toda-serie").addEventListener("click", () => {
+    const { id } = estado.tareaParaBorrar;
+    estado.datos.tareas = estado.datos.tareas.filter((t) => t.id !== id);
+    guardarDatos();
+    elModalBorrado.hidden = true;
+    estado.tareaParaBorrar = null;
+    renderTablero();
+  });
+
+  /* =========================================================
+     9. EXPORTAR / IMPORTAR JSON
+     ========================================================= */
+  document.getElementById("btn-exportar").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(estado.datos, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement("a");
+    const fechaHoy = formatearFechaISO(new Date());
+    enlace.href = url;
+    enlace.download = `mi-semana-${fechaHoy}.json`;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    URL.revokeObjectURL(url);
+  });
+
+  const elInputImportar = document.getElementById("input-importar");
+  const elModalImportar = document.getElementById("modal-confirmar-importar");
+  let datosPendientesDeImportar = null;
+
+  document.getElementById("btn-importar").addEventListener("click", () => elInputImportar.click());
+
+  elInputImportar.addEventListener("change", () => {
+    const archivo = elInputImportar.files[0];
+    if (!archivo) return;
+
+    const lector = new FileReader();
+    lector.onload = () => {
+      try {
+        const datos = JSON.parse(lector.result);
+        if (!datos || !Array.isArray(datos.categorias) || !Array.isArray(datos.tareas)) {
+          alert("El archivo no tiene el formato esperado de Mi Semana.");
+          return;
+        }
+        datosPendientesDeImportar = datos;
+        elModalImportar.hidden = false;
+      } catch (e) {
+        alert("No se pudo leer el archivo. Verificá que sea un JSON exportado desde Mi Semana.");
+      }
+    };
+    lector.readAsText(archivo);
+    elInputImportar.value = "";
+  });
+
+  document.getElementById("btn-cancelar-importar").addEventListener("click", () => {
+    elModalImportar.hidden = true;
+    datosPendientesDeImportar = null;
+  });
+
+  document.getElementById("btn-confirmar-importar").addEventListener("click", () => {
+    if (datosPendientesDeImportar) {
+      estado.datos = datosPendientesDeImportar;
+      guardarDatos();
+      datosPendientesDeImportar = null;
+      renderFiltroCategorias();
+      renderTablero();
+    }
+    elModalImportar.hidden = true;
+  });
+
+  /* =========================================================
+     10. MODO OSCURO
+     ========================================================= */
+  const CLAVE_TEMA = "misemana_tema";
+  const elChkTema = document.getElementById("chk-tema");
+
+  function aplicarTema(tema) {
+    if (tema === "oscuro") {
+      document.documentElement.setAttribute("data-tema", "oscuro");
+      elChkTema.checked = true;
+    } else if (tema === "claro") {
+      document.documentElement.setAttribute("data-tema", "claro");
+      elChkTema.checked = false;
+    } else {
+      document.documentElement.removeAttribute("data-tema");
+      elChkTema.checked = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+  }
+
+  function inicializarTema() {
+    const temaGuardado = localStorage.getItem(CLAVE_TEMA);
+    aplicarTema(temaGuardado);
+  }
+
+  elChkTema.addEventListener("change", () => {
+    const nuevoTema = elChkTema.checked ? "oscuro" : "claro";
+    localStorage.setItem(CLAVE_TEMA, nuevoTema);
+    aplicarTema(nuevoTema);
+  });
+
+  /* =========================================================
+     11. INICIALIZACIÓN
+     ========================================================= */
+  function iniciar() {
+    inicializarTema();
+    renderFiltroCategorias();
+    renderTablero();
+  }
+
+  iniciar();
+})();
+</script>
+</body>
+</html>
